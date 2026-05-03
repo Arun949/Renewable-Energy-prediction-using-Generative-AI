@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>R-energy — Renewable Energy Prediction</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Solar and wind energy forecasting using LSTM, Random Forest, and Generative AI on 11 years of German power data.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+
+<body>
+
+<!-- ─── NAVBAR ─── -->
+<nav class="navbar navbar-expand-lg navbar-dark ie-navbar sticky-top">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+            <div class="brand-icon"><i class="fa fa-bolt"></i></div>
+            <span class="brand-text">R-energy</span>
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="nav">
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+                <li class="nav-item"><a class="nav-link active" href="#hero">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+                <li class="nav-item"><a class="nav-link" href="#models">Models</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Predictors</a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="output.html"><i class="fa fa-solar-panel me-2 text-warning"></i>Solar Predictor</a></li>
+                        <li><a class="dropdown-item" href="output_wind.html"><i class="fa fa-wind me-2 text-primary"></i>Wind Predictor</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item ms-lg-2">
+                    <a class="btn btn-primary rounded-pill px-4" href="output.html">Try It Now</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section class="ie-hero" id="hero">
+    <div class="hero-bg-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+    </div>
+    <div class="container position-relative">
+        <div class="row align-items-center min-vh-hero">
+            <div class="col-lg-6 hero-content">
+                <div class="badge-pill mb-4">
+                    <i class="fa fa-award me-2"></i>Published · ICICNIC 2024
+                </div>
+                <h1 class="hero-title">Predict Renewable<br><span class="text-gradient">Energy Output</span><br>with Deep Learning</h1>
+                <p class="hero-sub">Forecasting solar &amp; wind generation across 11 years of German hourly data using LSTM, Random Forest, BiLSTM, and Generative AI.</p>
+                <div class="hero-actions">
+                    <a href="output.html" class="btn btn-primary btn-lg rounded-pill px-5">
+                        <i class="fa fa-solar-panel me-2"></i>Solar Predictor
+                    </a>
+                    <a href="output_wind.html" class="btn btn-outline-light btn-lg rounded-pill px-5">
+                        <i class="fa fa-wind me-2"></i>Wind Predictor
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 d-none d-lg-flex justify-content-center">
+                <div class="hero-visual">
+                    <div class="stat-card stat-card-1">
+                        <span class="stat-num">98.2<span class="stat-unit">%</span></span>
+                        <span class="stat-label">Solar Accuracy</span>
+                    </div>
+                    <div class="stat-card stat-card-2">
+                        <span class="stat-num">50K<span class="stat-unit">+</span></span>
+                        <span class="stat-label">Data Records</span>
+                    </div>
+                    <div class="stat-card stat-card-3">
+                        <span class="stat-num">6</span>
+                        <span class="stat-label">ML / DL Models</span>
+                    </div>
+                    <div class="hero-orb">
+                        <i class="fa fa-leaf fa-3x"></i>
+                        <p class="mb-0 mt-2 fw-semibold">R-energy</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="hero-wave">
+        <svg viewBox="0 0 1440 80" preserveAspectRatio="none"><path d="M0,40 C360,80 1080,0 1440,40 L1440,80 L0,80 Z" fill="#ffffff"/></svg>
+    </div>
+</section>
+
+<!-- ─── STATS BAR ─── -->
+<section class="ie-stats">
+    <div class="container">
+        <div class="row g-4 text-center">
+            <div class="col-6 col-md-3">
+                <div class="stat-pill"><i class="fa fa-database text-primary me-2"></i><strong>50,401</strong> Hourly Records</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-pill"><i class="fa fa-calendar text-success me-2"></i><strong>11 Years</strong> of Data</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-pill"><i class="fa fa-chart-line text-warning me-2"></i><strong>R² ≈ 0.99</strong> Wind Model</div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-pill"><i class="fa fa-bolt text-danger me-2"></i><strong>Germany</strong> Grid Data</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ─── ABOUT ─── -->
+<section class="ie-about py-6" id="about">
+    <div class="container">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6 fade-in-left">
+                <div class="about-img-wrap">
+                    <img src="img/about.jpg" alt="Renewable energy" class="img-fluid rounded-4 shadow-lg">
+                    <div class="about-badge">
+                        <i class="fa fa-globe-europe fa-2x text-primary mb-2"></i>
+                        <div class="fw-bold">Germany</div>
+                        <div class="small text-muted">46% Renewable</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6 fade-in-right">
+                <span class="section-tag">About the Project</span>
+                <h2 class="section-title">AI-Powered Forecasting for a Greener Grid</h2>
+                <p class="text-muted mb-4">Our system predicts hourly solar and wind power output using a dataset from <strong>Open Power System Data</strong> covering Germany — the world leader with 46% renewable energy share. Multiple ML and DL models are benchmarked to find the best predictor for each energy type.</p>
+                <div class="check-list">
+                    <div class="check-item"><i class="fa fa-check-circle text-primary"></i>Solar generation forecasting with 98.2% accuracy</div>
+                    <div class="check-item"><i class="fa fa-check-circle text-primary"></i>Wind generation prediction with R² ≈ 0.99</div>
+                    <div class="check-item"><i class="fa fa-check-circle text-primary"></i>GAN-based synthetic data augmentation</div>
+                    <div class="check-item"><i class="fa fa-check-circle text-primary"></i>Live prediction web interface</div>
+                </div>
+                <a href="output.html" class="btn btn-primary rounded-pill px-5 mt-4">Try the Predictor</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ─── PREDICTORS ─── -->
+<section class="ie-predictors py-6">
+    <div class="container">
+        <div class="text-center mb-6">
+            <span class="section-tag">Live Tools</span>
+            <h2 class="section-title">Energy Predictors</h2>
+            <p class="text-muted">Enter capacity and profile values — get instant generation forecasts.</p>
+        </div>
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="predictor-card solar-card">
+                    <div class="pred-icon"><i class="fa fa-solar-panel"></i></div>
+                    <h3>Solar Energy</h3>
+                    <p>Forecast solar generation (MWh) from capacity and capacity-factor inputs using a Random Forest model trained on 50K+ hourly records.</p>
+                    <ul class="pred-stats">
+                        <li><i class="fa fa-check"></i> Accuracy ~98.2%</li>
+                        <li><i class="fa fa-check"></i> Germany dataset</li>
+                        <li><i class="fa fa-check"></i> Random Forest + LSTM</li>
+                    </ul>
+                    <a href="output.html" class="btn btn-warning btn-lg rounded-pill px-5 mt-3 w-100">
+                        <i class="fa fa-bolt me-2"></i>Open Solar Predictor
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-5">
+                <div class="predictor-card wind-card">
+                    <div class="pred-icon"><i class="fa fa-wind"></i></div>
+                    <h3>Wind Energy</h3>
+                    <p>Forecast wind generation (MWh) from onshore/offshore capacity and wind profile using models benchmarked against MSE, MAE, and R².</p>
+                    <ul class="pred-stats">
+                        <li><i class="fa fa-check"></i> R² ≈ 0.99</li>
+                        <li><i class="fa fa-check"></i> Germany dataset</li>
+                        <li><i class="fa fa-check"></i> Random Forest + SVM</li>
+                    </ul>
+                    <a href="output_wind.html" class="btn btn-primary btn-lg rounded-pill px-5 mt-3 w-100">
+                        <i class="fa fa-bolt me-2"></i>Open Wind Predictor
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ─── MODELS ─── -->
+<section class="ie-models py-6 bg-light" id="models">
+    <div class="container">
+        <div class="text-center mb-6">
+            <span class="section-tag">Technology</span>
+            <h2 class="section-title">Models &amp; Techniques</h2>
+            <p class="text-muted">Six algorithms benchmarked — the best selected per energy type.</p>
+        </div>
+        <div class="row g-4">
+            <div class="col-sm-6 col-lg-4">
+                <div class="model-card">
+                    <div class="model-icon" style="--c:#32C36C"><i class="fa fa-brain"></i></div>
+                    <h5>LSTM / BiLSTM</h5>
+                    <p class="text-muted small">Long Short-Term Memory networks capture temporal dependencies in energy time-series data.</p>
+                    <span class="model-badge deep-learning">Deep Learning</span>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+                <div class="model-card">
+                    <div class="model-icon" style="--c:#3b82f6"><i class="fa fa-layer-group"></i></div>
+                    <h5>CNN-LSTM</h5>
+                    <p class="text-muted small">Convolutional layers extract spatial features; LSTM layers model sequential patterns.</p>
+                    <span class="model-badge deep-learning">Deep Learning</span>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+                <div class="model-card">
+                    <div class="model-icon" style="--c:#f59e0b"><i class="fa fa-tree"></i></div>
+                    <h5>Random Forest</h5>
+                    <p class="text-muted small">Ensemble of decision trees. Best for solar prediction — fast, robust, R² ≈ 0.98.</p>
+                    <span class="model-badge ensemble">Ensemble</span>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+                <div class="model-card">
+                    <div class="model-icon" style="--c:#8b5cf6"><i class="fa fa-vector-square"></i></div>
+                    <h5>Support Vector Regressor</h5>
+                    <p class="text-muted small">SVM with RBF kernel. Best performer for wind energy regression tasks.</p>
+                    <span class="model-badge ml">Machine Learning</span>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+                <div class="model-card">
+                    <div class="model-icon" style="--c:#ec4899"><i class="fa fa-random"></i></div>
+                    <h5>GAN</h5>
+                    <p class="text-muted small">Generative Adversarial Networks synthesise new training samples to augment sparse data periods.</p>
+                    <span class="model-badge generative">Generative AI</span>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+                <div class="model-card">
+                    <div class="model-icon" style="--c:#06b6d4"><i class="fa fa-chart-area"></i></div>
+                    <h5>ARIMA / SARIMAX</h5>
+                    <p class="text-muted small">Classical time-series baselines used to benchmark against deep learning approaches.</p>
+                    <span class="model-badge classical">Statistical</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ─── HOW IT WORKS ─── -->
+<section class="ie-how py-6">
+    <div class="container">
+        <div class="text-center mb-6">
+            <span class="section-tag">Workflow</span>
+            <h2 class="section-title">How It Works</h2>
+        </div>
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <div class="how-step">
+                    <div class="step-num">01</div>
+                    <div class="step-icon"><i class="fa fa-database"></i></div>
+                    <h5>Data Preprocessing</h5>
+                    <p class="text-muted small">50,401 hourly records cleaned, null-filled, and scaled using MinMaxScaler. Correlation analysis + feature importance applied.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="how-step">
+                    <div class="step-num">02</div>
+                    <div class="step-icon"><i class="fa fa-cogs"></i></div>
+                    <h5>Model Training</h5>
+                    <p class="text-muted small">Six models trained with cross-validation. KerasTuner Hyperband used for LSTM hyperparameter optimisation.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="how-step">
+                    <div class="step-num">03</div>
+                    <div class="step-icon"><i class="fa fa-chart-line"></i></div>
+                    <h5>Prediction &amp; Evaluation</h5>
+                    <p class="text-muted small">Best models selected by RMSE, MAE, MAPE and R². Live API serves predictions through the web interface.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ─── GRAPHS ─── -->
+<section class="ie-graphs py-6 bg-light">
+    <div class="container">
+        <div class="text-center mb-6">
+            <span class="section-tag">Results</span>
+            <h2 class="section-title">Prediction Visualisations</h2>
+            <p class="text-muted">Model output vs. true values across the Germany dataset.</p>
+        </div>
+        <div class="row g-4 align-items-center">
+            <div class="col-md-6 text-center">
+                <div class="graph-card">
+                    <div class="graph-label"><i class="fa fa-solar-panel text-warning me-2"></i>Solar Generation Forecast</div>
+                    <img src="img/graph1.png" alt="Solar prediction graph" class="img-fluid rounded-3">
+                </div>
+            </div>
+            <div class="col-md-6 text-center">
+                <div class="graph-card">
+                    <div class="graph-label"><i class="fa fa-wind text-primary me-2"></i>Wind Generation Forecast</div>
+                    <img src="img/graph2.png" alt="Wind prediction graph" class="img-fluid rounded-3">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ─── FOOTER ─── -->
+<footer class="ie-footer">
+    <div class="container">
+        <div class="row g-5">
+            <div class="col-lg-4">
+                <div class="footer-brand">
+                    <div class="brand-icon"><i class="fa fa-bolt"></i></div>
+                    <span class="brand-text">R-energy</span>
+                </div>
+                <p class="text-muted mt-3 small">Renewable energy generation forecasting using Deep Learning &amp; Generative AI. Published at ICICNIC 2024.</p>
+                <p class="text-muted small"><i class="fa fa-university me-2"></i>Kalasalingam Academy of Research and Education</p>
+            </div>
+            <div class="col-lg-4">
+                <h6 class="footer-heading">Predictors</h6>
+                <ul class="footer-links">
+                    <li><a href="output.html"><i class="fa fa-solar-panel me-2"></i>Solar Energy Predictor</a></li>
+                    <li><a href="output_wind.html"><i class="fa fa-wind me-2"></i>Wind Energy Predictor</a></li>
+                </ul>
+                <h6 class="footer-heading mt-4">Dataset</h6>
+                <ul class="footer-links">
+                    <li><a href="#about">Open Power System Data — Germany</a></li>
+                    <li><a href="#models">50,401 hourly records · 2015–2026</a></li>
+                </ul>
+            </div>
+            <div class="col-lg-4">
+                <h6 class="footer-heading">Tech Stack</h6>
+                <div class="tech-tags">
+                    <span>Python</span><span>TensorFlow</span><span>Keras</span>
+                    <span>scikit-learn</span><span>Flask</span><span>pandas</span>
+                    <span>NumPy</span><span>Keras Tuner</span>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p class="text-muted small mb-0">&copy; 2024 R-energy · Renewable Energy Prediction using Deep Learning &amp; Generative AI</p>
+        </div>
+    </div>
+</footer>
+
+<!-- Back to Top -->
+<a href="#" class="back-to-top" id="backToTop"><i class="fa fa-arrow-up"></i></a>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Back to top
+    const btt = document.getElementById('backToTop');
+    window.addEventListener('scroll', () => {
+        btt.classList.toggle('show', window.scrollY > 400);
+    });
+    btt.addEventListener('click', e => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+    // Fade-in on scroll
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.fade-in-left, .fade-in-right, .model-card, .how-step, .predictor-card, .graph-card').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

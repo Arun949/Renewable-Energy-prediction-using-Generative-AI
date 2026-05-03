@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>R-energy — Wind Energy Predictor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+    <style>
+        body { background: #0f1f2e; color: #e2e8f0; }
+
+        .pred-page { min-height: 100vh; padding: 2rem 0 4rem; }
+
+        .pred-header {
+            background: linear-gradient(135deg, #0f2640, #0a1f38);
+            border-bottom: 1px solid rgba(255,255,255,.06);
+            padding: 2.5rem 0 2rem;
+            margin-bottom: 2.5rem;
+        }
+        .pred-header h1 { font-size: 2.2rem; font-weight: 900; color: #fff; }
+        .pred-header p  { color: rgba(255,255,255,.6); max-width: 520px; }
+        .pred-header .header-icon {
+            width: 64px; height: 64px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            border-radius: 18px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; color: #fff;
+            box-shadow: 0 8px 24px rgba(59,130,246,.35);
+        }
+
+        .form-card {
+            background: #1a2d3e;
+            border: 1px solid rgba(255,255,255,.06);
+            border-radius: 20px;
+            padding: 2rem;
+        }
+        .form-card .form-label { color: #94a3b8; font-size: .85rem; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+        .form-card .form-select,
+        .form-card .form-control {
+            background: #0f1f2e;
+            border: 1px solid rgba(255,255,255,.1);
+            color: #e2e8f0;
+            border-radius: 12px;
+            padding: .75rem 1rem;
+            font-size: .95rem;
+        }
+        .form-card .form-select:focus,
+        .form-card .form-control:focus {
+            background: #0f1f2e;
+            border-color: #3b82f6;
+            color: #e2e8f0;
+            box-shadow: 0 0 0 3px rgba(59,130,246,.2);
+        }
+        .form-card .form-select option { background: #1a2d3e; }
+        .year-display {
+            font-size: 2rem; font-weight: 900;
+            color: #3b82f6;
+            min-width: 70px; text-align: right;
+        }
+        .range-wind { accent-color: #3b82f6; }
+        .location-info { color: #64748b; font-size: .8rem; margin-top: .35rem; font-style: italic; }
+
+        .btn-predict {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            border: none; color: #fff;
+            font-weight: 700; font-size: 1rem;
+            border-radius: 14px;
+            padding: .85rem 2rem;
+            width: 100%;
+            transition: opacity .2s, transform .2s;
+        }
+        .btn-predict:hover { opacity: .9; transform: translateY(-1px); color: #fff; }
+        .btn-predict:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+        .result-area { display: none; margin-top: 2rem; }
+
+        .kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+        .kpi-card {
+            background: #1a2d3e;
+            border: 1px solid rgba(255,255,255,.06);
+            border-radius: 16px;
+            padding: 1.25rem 1rem;
+            text-align: center;
+        }
+        .kpi-card .kpi-value { font-size: 1.8rem; font-weight: 900; color: #3b82f6; line-height: 1; }
+        .kpi-card .kpi-unit  { font-size: .75rem; color: #64748b; }
+        .kpi-card .kpi-label { font-size: .78rem; color: #94a3b8; margin-top: .3rem; }
+
+        .chart-card {
+            background: #0f1f2e;
+            border: 1px solid rgba(255,255,255,.06);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        .chart-card img { width: 100%; display: block; }
+
+        .monthly-card {
+            background: #1a2d3e;
+            border: 1px solid rgba(255,255,255,.06);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .monthly-card h6 { color: #94a3b8; font-size: .8rem; text-transform: uppercase; letter-spacing: .5px; }
+        .month-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; margin-top: 1rem; }
+        .month-item {
+            background: #0f1f2e;
+            border-radius: 10px;
+            padding: .6rem .5rem;
+            text-align: center;
+        }
+        .month-item.peak { border: 1px solid #32C36C; }
+        .month-item .m-name { font-size: .7rem; color: #64748b; }
+        .month-item .m-val  { font-size: .95rem; font-weight: 700; color: #e2e8f0; }
+        .month-item.peak .m-val { color: #32C36C; }
+
+        .loc-badge {
+            display: inline-flex; align-items: center; gap: .4rem;
+            background: rgba(59,130,246,.12);
+            border: 1px solid rgba(59,130,246,.25);
+            color: #3b82f6;
+            border-radius: 100px;
+            padding: .3rem .9rem;
+            font-size: .82rem; font-weight: 600;
+        }
+
+        .error-box {
+            background: #2d1a1a; border: 1px solid #7f1d1d;
+            border-radius: 12px; padding: 1rem 1.25rem;
+            color: #fca5a5; display: none; margin-top: 1rem;
+        }
+
+@media (max-width: 575px) {
+            .kpi-row { grid-template-columns: repeat(2, 1fr); }
+            .month-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark ie-navbar sticky-top">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+            <div class="brand-icon"><i class="fa fa-bolt"></i></div>
+            <span class="brand-text">R-energy</span>
+        </a>
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="nav">
+            <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-1">
+                <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle active" href="#" data-bs-toggle="dropdown">Predictors</a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="output.html"><i class="fa fa-solar-panel me-2 text-warning"></i>Solar Predictor</a></li>
+                        <li><a class="dropdown-item active" href="output_wind.html"><i class="fa fa-wind me-2 text-primary"></i>Wind Predictor</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Header -->
+<div class="pred-header">
+    <div class="container">
+        <div class="d-flex align-items-center gap-4">
+            <div class="header-icon"><i class="fa fa-wind"></i></div>
+            <div>
+                <h1>Wind Energy Predictor</h1>
+                <p class="mb-0">Select a year and German state — get a full 12-month wind generation forecast with an interactive chart.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main -->
+<div class="container pred-page">
+    <div class="row g-4">
+
+        <!-- Left: Form -->
+        <div class="col-lg-4">
+            <div class="form-card">
+                <h5 class="fw-bold text-white mb-4"><i class="fa fa-sliders me-2 text-primary"></i>Prediction Inputs</h5>
+
+                <!-- Year -->
+                <div class="mb-4">
+                    <label class="form-label">Forecast Year</label>
+                    <div class="d-flex align-items-center gap-3">
+                        <input type="range" class="form-range range-wind flex-grow-1" id="yearSlider"
+                            min="2015" max="2030" step="1" value="2024"
+                            oninput="document.getElementById('yearDisplay').textContent=this.value">
+                        <span class="year-display" id="yearDisplay">2024</span>
+                    </div>
+                    <div class="d-flex justify-content-between mt-1">
+                        <small class="text-muted">2015</small>
+                        <small class="text-muted">Historical ←→ Forecast</small>
+                        <small class="text-muted">2030</small>
+                    </div>
+                </div>
+
+                <!-- Location -->
+                <div class="mb-4">
+                    <label class="form-label" for="locationSelect">German State / Region</label>
+                    <select class="form-select" id="locationSelect" onchange="updateLocationInfo()">
+                        <option value="Lower Saxony">Lower Saxony</option>
+                        <option value="Schleswig-Holstein">Schleswig-Holstein</option>
+                        <option value="Brandenburg">Brandenburg</option>
+                        <option value="Mecklenburg-Vorpommern">Mecklenburg-Vorpommern</option>
+                        <option value="Saxony-Anhalt">Saxony-Anhalt</option>
+                        <option value="Hamburg">Hamburg</option>
+                        <option value="North Rhine-Westphalia">North Rhine-Westphalia</option>
+                        <option value="Thuringia (Thüringen)">Thuringia (Thüringen)</option>
+                        <option value="Hesse (Hessen)">Hesse (Hessen)</option>
+                        <option value="Rhineland-Palatinate">Rhineland-Palatinate</option>
+                        <option value="Baden-Württemberg">Baden-Württemberg</option>
+                        <option value="Bavaria (Bayern)">Bavaria (Bayern)</option>
+                    </select>
+                    <div class="location-info" id="locationInfo">Northwest — strong North Sea influence</div>
+                </div>
+
+                <button class="btn-predict" id="predictBtn" onclick="runPrediction()">
+                    <span id="btnSpinner" class="spinner-border spinner-border-sm me-2 d-none"></span>
+                    <i class="fa fa-bolt me-2" id="btnIcon"></i>Predict Wind Generation
+                </button>
+
+            </div>
+        </div>
+
+        <!-- Right: Results -->
+        <div class="col-lg-8">
+            <!-- Placeholder -->
+            <div id="placeholder" class="text-center py-5">
+                <div style="font-size:5rem; opacity:.15; margin-bottom:1rem;">💨</div>
+                <h4 class="text-muted fw-semibold">Your prediction will appear here</h4>
+                <p class="text-muted small">Choose a year and location, then click Predict.</p>
+            </div>
+
+            <!-- Results -->
+            <div class="result-area" id="resultArea">
+                <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
+                    <span class="loc-badge" id="locBadge"><i class="fa fa-map-marker-alt"></i> —</span>
+                    <span class="text-muted small" id="locDesc">—</span>
+                </div>
+
+                <div class="kpi-row">
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="kpiAnnual">—</div>
+                        <div class="kpi-unit">GWh / year</div>
+                        <div class="kpi-label">Annual Generation</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="kpiCap">—</div>
+                        <div class="kpi-unit">MW</div>
+                        <div class="kpi-label">Installed Capacity</div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-value" id="kpiPeak" style="font-size:1.4rem;">—</div>
+                        <div class="kpi-unit">month</div>
+                        <div class="kpi-label">Peak Generation</div>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <img id="chartImg" src="" alt="Monthly wind generation chart">
+                </div>
+
+                <div class="monthly-card">
+                    <h6><i class="fa fa-table me-2"></i>Monthly Breakdown</h6>
+                    <div class="month-grid" id="monthGrid"></div>
+                </div>
+            </div>
+
+            <div class="error-box" id="errorBox">
+                <i class="fa fa-triangle-exclamation me-2"></i>
+                <span id="errorMsg">Server not reachable. Make sure <code>python app.py</code> is running.</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="ie-footer mt-5">
+    <div class="container">
+        <div class="footer-bottom">
+            <p class="text-muted small mb-0">&copy; 2024 R-energy — Renewable Energy Prediction using Deep Learning &amp; Generative AI</p>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+const LOCATION_DESC = {
+    "Lower Saxony":            "Northwest — strong North Sea influence",
+    "Schleswig-Holstein":      "Northern coast — best wind in Germany",
+    "Brandenburg":             "Central — flat, good wind corridor",
+    "Mecklenburg-Vorpommern":  "Northeast coast — excellent offshore wind",
+    "Saxony-Anhalt":           "East — good flat-terrain winds",
+    "Hamburg":                 "Port city — coastal wind advantage",
+    "North Rhine-Westphalia":  "West — moderate wind resources",
+    "Thuringia (Thüringen)":   "Central — moderate wind",
+    "Hesse (Hessen)":          "Central — below-average wind",
+    "Rhineland-Palatinate":    "West-Central — moderate wind",
+    "Baden-Württemberg":       "Southwest — limited wind resources",
+    "Bavaria (Bayern)":        "Southern — lowest wind potential",
+};
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+function updateLocationInfo() {
+    const loc = document.getElementById('locationSelect').value;
+    document.getElementById('locationInfo').textContent = LOCATION_DESC[loc] || '';
+}
+
+async function runPrediction() {
+    const year     = parseInt(document.getElementById('yearSlider').value);
+    const location = document.getElementById('locationSelect').value;
+
+    const btn     = document.getElementById('predictBtn');
+    const spinner = document.getElementById('btnSpinner');
+    const icon    = document.getElementById('btnIcon');
+    const errBox  = document.getElementById('errorBox');
+
+    btn.disabled         = true;
+    spinner.classList.remove('d-none');
+    icon.classList.add('d-none');
+    errBox.style.display = 'none';
+    document.getElementById('placeholder').style.display = 'none';
+
+    try {
+        const res = await fetch('/api/predict/wind', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ year, location }),
+        });
+        if (!res.ok) throw new Error('Server returned ' + res.status);
+        const d = await res.json();
+
+        document.getElementById('kpiAnnual').textContent = d.annual_gwh.toLocaleString();
+        document.getElementById('kpiCap').textContent    = d.capacity_mw.toLocaleString();
+        document.getElementById('kpiPeak').textContent   = d.peak_month;
+        document.getElementById('locBadge').innerHTML    = `<i class="fa fa-map-marker-alt"></i> ${d.location} · ${d.year}`;
+        document.getElementById('locDesc').textContent   = d.location_desc;
+
+        document.getElementById('chartImg').src = d.chart;
+
+        const peak = d.monthly_gwh.indexOf(Math.max(...d.monthly_gwh));
+        document.getElementById('monthGrid').innerHTML = d.monthly_gwh.map((v, i) =>
+            `<div class="month-item ${i === peak ? 'peak' : ''}">
+                <div class="m-name">${MONTHS[i]}</div>
+                <div class="m-val">${v.toLocaleString()}</div>
+                <div class="kpi-unit">GWh</div>
+             </div>`
+        ).join('');
+
+        document.getElementById('resultArea').style.display = 'block';
+
+    } catch (err) {
+        document.getElementById('errorMsg').innerHTML =
+            'Could not reach server. Run <code>python app.py</code> then open <a href="http://localhost:5000/wind" class="text-primary">localhost:5000/wind</a>.';
+        errBox.style.display = 'block';
+        document.getElementById('placeholder').style.display = 'block';
+    } finally {
+        btn.disabled = false;
+        spinner.classList.add('d-none');
+        icon.classList.remove('d-none');
+    }
+}
+</script>
+</body>
+</html>

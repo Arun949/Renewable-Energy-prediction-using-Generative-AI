@@ -78,6 +78,17 @@ target/
 
 # Jupyter Notebook
 .ipynb_checkpoints
+*.ipynb_checkpoints
+
+# Trained model artifacts
+models/
+my_dir/
+*.pkl
+*.h5
+*.keras
+
+# macOS
+.DS_Store
 
 # IPython
 profile_default/
