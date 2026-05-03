@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(python3 app.py)",
-      "Bash(curl -s http://localhost:5000/api/locations/solar)"
-    ]
-  }
-}
