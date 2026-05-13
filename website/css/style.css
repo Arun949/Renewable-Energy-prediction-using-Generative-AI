@@ -317,6 +317,13 @@ body { font-family: 'Inter', sans-serif; color: var(--text); background: #fff; }
 .predictor-card.visible, .graph-card.visible {
     opacity: 1; transform: none;
 }
+/* Fallback: if JS hasn't run or user prefers no motion, always show content */
+@media (prefers-reduced-motion: reduce) {
+    .fade-in-left, .fade-in-right,
+    .model-card, .how-step, .predictor-card, .graph-card {
+        opacity: 1; transform: none; transition: none;
+    }
+}
 
 /* ─── Responsive ─── */
 @media (max-width: 991px) {

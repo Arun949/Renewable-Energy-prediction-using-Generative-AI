@@ -367,8 +367,12 @@
     // Fade-in on scroll
     const observer = new IntersectionObserver(entries => {
         entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
-    }, { threshold: 0.15 });
+    }, { threshold: 0.05, rootMargin: '0px 0px -40px 0px' });
     document.querySelectorAll('.fade-in-left, .fade-in-right, .model-card, .how-step, .predictor-card, .graph-card').forEach(el => observer.observe(el));
+    // Safety fallback: reveal all after 1.5s in case observer doesn't fire
+    setTimeout(() => {
+        document.querySelectorAll('.fade-in-left, .fade-in-right, .model-card, .how-step, .predictor-card, .graph-card').forEach(el => el.classList.add('visible'));
+    }, 1500);
 </script>
 </body>
 </html>
