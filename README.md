@@ -12,9 +12,6 @@
   A full-stack web application that predicts <strong>solar and wind energy output</strong> across German states using classical ML, deep learning (LSTM), and 10 years of real hourly grid data — with a generative engine that extrapolates capacity growth into future years.
 </p>
 
-<p align="center">
-  <a href="https://www.youtube.com/watch?v=BQPUwUDnKRE" target="_blank">▶ Watch Video Demo</a>
-</p>
 
 ---
 
