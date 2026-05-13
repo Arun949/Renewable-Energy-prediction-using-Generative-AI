@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  A full-stack web application that predicts <strong>solar and wind energy output</strong> across German states using classical ML, deep learning (LSTM), and real historical grid data — with a generative profile engine for future-year forecasting.
+  A full-stack web application that predicts <strong>solar and wind energy output</strong> across German states using classical ML, deep learning (LSTM), and 10 years of real hourly grid data — with a generative engine that extrapolates capacity growth into future years.
 </p>
 
 <p align="center">
@@ -21,6 +21,7 @@
 ## Table of Contents
 
 - [Overview](#overview)
+- [Live API — Sample Output](#live-api--sample-output)
 - [Key Features](#key-features)
 - [Tech Stack](#tech-stack)
 - [Dataset](#dataset)
@@ -28,6 +29,7 @@
 - [Models & Results](#models--results)
 - [Project Structure](#project-structure)
 - [Getting Started](#getting-started)
+- [API Reference](#api-reference)
 - [How It Works](#how-it-works)
 - [Screenshots](#screenshots)
 - [Team](#team)
@@ -38,23 +40,63 @@
 
 Solar and wind energy are central to the global shift toward clean power — but their intermittent nature makes planning difficult. This project builds a prediction system that:
 
-- Forecasts **monthly solar and wind energy generation (MWh)** for any German state and any year (2015–2030+)
-- Uses **real historical data** from the Open Power System Data platform to derive seasonal profiles
-- Applies **location-specific capacity factors** for each of 12 German states
-- Combines **ML/DL models** with a **generative capacity-growth engine** to simulate future years beyond the training data
+- Forecasts **monthly solar and wind energy generation (GWh)** for any of 12 German states across any year from 2015 to 2030+
+- Derives real **seasonal generation profiles** from 10 years of hourly German grid data (2015–2024)
+- Applies **location-specific capacity factors** — for example, Bavaria has Germany's highest solar irradiance; Schleswig-Holstein has its strongest wind corridor
+- Uses a **generative capacity-growth engine** to linearly extrapolate installed MW into future years beyond the training data
 
-Germany was chosen as the focus because it leads Europe in renewable adoption (~46% of energy from renewables) and serves as a strong indicator of global trends.
+Germany was chosen as the focus because it leads Europe in renewable adoption (~46% energy from renewables) and serves as a strong indicator of global trends.
+
+---
+
+## Live API — Sample Output
+
+The app exposes a REST API. Here are real responses from the running server:
+
+**Solar — Bavaria (Bayern), 2024**
+```json
+{
+  "location": "Bavaria (Bayern)",
+  "location_desc": "Southern Germany — highest solar irradiance",
+  "year": 2024,
+  "capacity_mw": 18018,
+  "annual_gwh": 20602.7,
+  "peak_month": "Jul",
+  "monthly_gwh": [391.66, 916.90, 1588.01, 2426.52, 2779.96, 2887.76,
+                  2900.27, 2645.56, 1953.78, 1168.27, 559.62, 384.38]
+}
+```
+
+**Wind — Schleswig-Holstein, 2024**
+```json
+{
+  "location": "Schleswig-Holstein",
+  "location_desc": "Northern coast — best wind in Germany",
+  "year": 2024,
+  "capacity_mw": 8628,
+  "annual_gwh": 32792.0,
+  "peak_month": "Dec",
+  "monthly_gwh": [3910.50, 3150.26, 3317.64, 2510.20, 2218.72, 1801.51,
+                  1852.33, 1728.24, 2145.01, 2768.45, 3233.34, 4155.76]
+}
+```
+
+**Future year forecast — Bavaria Solar, 2028** (generative extrapolation)
+```json
+{ "annual_gwh": 29155.7, "capacity_mw": 25498, "year": 2028 }
+```
 
 ---
 
 ## Key Features
 
-- **Location-aware predictions** — 12 German states each with distinct solar irradiance and wind corridor profiles
-- **Year-range forecasting** — supports past years (historical) and future years (generative extrapolation up to 2030+)
-- **Multiple ML/DL models** — Ridge/Lasso Regression, Decision Tree, SVM, Random Forest, LSTM
-- **Automated model selection** — models benchmarked on RMSE, MAE, and accuracy; best model retained per energy type
-- **Interactive web UI** — Flask backend + HTML/CSS/JS frontend with real-time chart generation
-- **Keras Tuner hyperparameter optimization** — automated tuning for the LSTM model
+- **12 German states** — each with individually calibrated solar irradiance and wind corridor capacity factors
+- **Historical + future forecasting** — 2015–2024 backed by real data; 2025–2030+ via generative capacity extrapolation
+- **Multiple ML/DL models** — Ridge Regression, Lasso Regression, Decision Tree, SVM, Random Forest, LSTM
+- **Automated model selection** — benchmarked on RMSE, MAE, and accuracy; best model saved per energy type
+- **Keras Tuner** — automated hyperparameter optimization for the LSTM
+- **Real-time chart generation** — Matplotlib renders dark-themed bar + cumulative line charts, returned as base64 PNG
+- **Interactive web UI** — Flask backend + Bootstrap/JS frontend; no page reload required for predictions
 
 ---
 
@@ -62,33 +104,41 @@ Germany was chosen as the focus because it leads Europe in renewable adoption (~
 
 | Layer | Technology |
 |---|---|
-| Backend | Python 3.10+, Flask, Flask-CORS |
-| Frontend | HTML5, CSS3, Bootstrap, JavaScript |
-| ML Models | scikit-learn (Ridge, Lasso, SVM, Random Forest, Decision Tree) |
+| Backend | Python 3.10+, Flask 2.3+, Flask-CORS |
+| Frontend | HTML5, CSS3, Bootstrap 5, JavaScript (Fetch API) |
+| ML Models | scikit-learn — Ridge, Lasso, SVM, Random Forest, Decision Tree |
 | Deep Learning | TensorFlow 2.13+, LSTM, Keras Tuner |
-| Data & Viz | pandas, NumPy, Matplotlib, Seaborn, statsmodels |
-| Model Persistence | joblib |
-| Dataset | Open Power System Data (Germany, hourly, 2015–2024) |
+| Data & Visualization | pandas, NumPy, Matplotlib, Seaborn, statsmodels |
+| Model Persistence | joblib (.pkl) |
+| Dataset | Open Power System Data — Germany hourly, 2015–2024 |
 
 ---
 
 ## Dataset
 
-Data sourced from [Open Power System Data](https://open-power-system-data.org/) — an open platform covering power systems across 37 European countries. The Germany dataset was selected for its completeness and renewable energy diversity.
+Data sourced from [Open Power System Data](https://open-power-system-data.org/) — an open platform covering power systems across 37 European countries. The Germany dataset was selected for its completeness and renewable energy diversity (~10 years of hourly records).
 
 **Key columns used:**
-- `utc_timestamp` — hourly time index
-- `solar_capacity`, `wind_capacity` — installed capacity in MW
-- `solar_profile`, `wind_profile` — normalized generation profiles
-- `wind_onshore_profile`, `wind_offshore_profile` — onshore/offshore wind breakdown
-- `solar_generation_actual`, `wind_generation_actual` — target variables
+| Column | Description |
+|---|---|
+| `utc_timestamp` | Hourly time index |
+| `DE_solar_capacity` | National installed solar capacity (MW) |
+| `DE_wind_capacity` | National installed wind capacity (MW) |
+| `DE_solar_profile` | Normalized solar generation profile |
+| `DE_wind_profile` | Normalized wind generation profile |
+| `DE_wind_onshore_profile` | Onshore wind profile |
+| `DE_wind_offshore_profile` | Offshore wind profile |
+| `DE_solar_generation_actual` | Target: actual solar generation |
+| `DE_wind_generation_actual` | Target: actual wind generation |
 
-Installed capacity by year (Germany national, MW):
+**Germany national installed capacity (MW):**
 
 | Year | Solar | Wind |
-|------|-------|------|
+|------|------:|-----:|
 | 2015 | 37,400 | 44,900 |
+| 2018 | 45,200 | 59,300 |
 | 2020 | 53,700 | 62,200 |
+| 2022 | 66,500 | 66,300 |
 | 2024 | 81,900 | 71,900 |
 
 ---
@@ -96,65 +146,65 @@ Installed capacity by year (Germany national, MW):
 ## Data Preprocessing
 
 ### Handling Null Values
-- **Solar generation**: nulls filled using the prior-day value; first-of-month nulls defaulted to 0 (pre-dawn assumption); remaining NaNs replaced with column mean.
-- **Wind generation**: nulls replaced with column mean throughout.
+- **Solar generation**: nulls filled from the previous day's value; first-of-month nulls set to 0 (pre-dawn assumption); remaining NaNs replaced with column mean.
+- **Wind generation**: all nulls replaced with column mean.
 
 ### Correlation Analysis
-Feature correlation to target variables was computed to identify the most predictive inputs:
-- Solar: `solar_profile` showed highest correlation with solar output
-- Wind: `wind_profile`, `wind_onshore_profile`, `wind_onshore_generation` were top predictors
+Feature correlation identified the strongest predictors per target:
+- **Solar**: `DE_solar_profile` had the highest correlation with solar output
+- **Wind**: `DE_wind_profile`, `DE_wind_onshore_profile`, and `DE_wind_onshore_generation` were top predictors
 
 ![Correlation Heatmap](https://user-images.githubusercontent.com/87893594/211166795-6f554565-dee5-4d3d-8998-0795c909fd10.png)
 
 ### Feature Importance
-Random Forest feature importance scores were used alongside correlation analysis to filter out low-signal variables, reducing model bias and improving generalization.
+Random Forest feature importance scores were computed alongside correlation analysis to remove low-signal variables, reducing model bias and improving generalization.
 
 ---
 
 ## Models & Results
 
-Six models were trained and evaluated on standard regression metrics:
+Six models trained and evaluated on standard regression metrics (RMSE, MAE, Accuracy):
 
-| Model | Energy Type | Best Metric |
+| Model | Best For | Notes |
 |---|---|---|
-| Ridge Regression | Solar & Wind | Baseline |
-| Lasso Regression | Solar & Wind | Baseline |
-| Decision Tree | Solar & Wind | — |
+| Ridge Regression | Solar & Wind | Regularized linear baseline |
+| Lasso Regression | Solar & Wind | Sparse feature baseline |
+| Decision Tree | — | Prone to overfitting |
 | SVM | **Wind** | Best classical ML for wind |
-| Random Forest | **Solar** | Best classical ML for solar |
-| **LSTM** | **Solar** | ~98.2% accuracy |
+| Random Forest | **Solar** | Best classical ML for solar; models saved as `.pkl` |
+| **LSTM** | **Solar** | ~98.2% accuracy; best overall on solar |
 
-**Key finding:** SVM was best for wind energy prediction; Random Forest for solar. The LSTM deep learning model achieved ~98.2% accuracy on solar generation.
+**Saved production models:** `solar_rf.pkl` (Random Forest), `wind_rf.pkl` (Random Forest) — both with fitted scalers.
 
 ![Model Results 1](https://user-images.githubusercontent.com/74909133/211185941-6d9292c6-acee-476a-9dd6-467f804c80b5.jpeg)
 ![Model Results 2](https://user-images.githubusercontent.com/74909133/211185945-1c4de132-e170-4307-b1b0-94b7b6e4fef5.jpeg)
 ![LSTM True vs Predicted](https://user-images.githubusercontent.com/74909133/211186083-d5179172-9220-4d6b-b62a-08490c9e6b7e.jpeg)
-<p align="center"><em>LSTM — True values vs Predicted values</em></p>
+<p align="center"><em>LSTM — True values vs Predicted values (solar generation)</em></p>
 
 ---
 
 ## Project Structure
 
 ```
-├── app.py                          # Flask backend — API routes & prediction logic
-├── requirements.txt                # Python dependencies
-├── time_series_60min_singleindex_filtered.csv  # Germany hourly energy dataset
+├── app.py                                       # Flask backend — all API routes & prediction logic
+├── requirements.txt                             # Python dependencies
+├── time_series_60min_singleindex_filtered.csv   # Germany hourly energy dataset (2015–2024)
 ├── models/
-│   ├── solar_rf.pkl                # Trained Random Forest (solar)
-│   ├── solar_scaler.pkl            # Feature scaler (solar)
-│   ├── wind_rf.pkl                 # Trained Random Forest (wind)
-│   └── wind_scaler.pkl             # Feature scaler (wind)
+│   ├── solar_rf.pkl                             # Trained Random Forest model (solar)
+│   ├── solar_scaler.pkl                         # Feature scaler (solar)
+│   ├── wind_rf.pkl                              # Trained Random Forest model (wind)
+│   └── wind_scaler.pkl                          # Feature scaler (wind)
 ├── website/
-│   ├── index.html                  # Main landing page
-│   ├── output.html                 # Solar prediction results page
-│   ├── output_wind.html            # Wind prediction results page
-│   ├── css/                        # Stylesheets
-│   ├── js/                         # Frontend scripts
-│   └── img/                        # Static assets
-├── MAIN .ipynb                     # Full model training & evaluation notebook
-├── LSTM Code .ipynb                # LSTM deep learning notebook
-├── ANOTHER.ipynb                   # Supplementary analysis notebook
-└── Collab Notebook-Arunkumar.ipynb # Collaborative exploration notebook
+│   ├── index.html                               # Landing page (hero, about, models sections)
+│   ├── output.html                              # Solar predictor page
+│   ├── output_wind.html                         # Wind predictor page
+│   ├── css/                                     # Bootstrap + custom styles
+│   ├── js/                                      # Fetch API calls & chart rendering
+│   └── img/                                     # Static assets
+├── MAIN .ipynb                                  # Full model training & evaluation notebook
+├── LSTM Code .ipynb                             # LSTM deep learning notebook
+├── ANOTHER.ipynb                                # Supplementary analysis notebook
+└── Collab Notebook-Arunkumar.ipynb              # Collaborative exploration notebook
 ```
 
 ---
@@ -182,27 +232,87 @@ pip install -r requirements.txt
 python app.py
 ```
 
-Open your browser at `http://localhost:5000`.
+The server starts at **http://localhost:5000**. You will see:
+```
+Loading dataset to derive seasonal profiles …
+Seasonal profiles ready.
+iEnergy server → http://localhost:5000
+```
+
+---
+
+## API Reference
+
+All endpoints are served from `http://localhost:5000`.
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/` | Landing page |
+| `GET` | `/solar` | Solar predictor UI |
+| `GET` | `/wind` | Wind predictor UI |
+| `GET` | `/api/locations/solar` | List of 12 states for solar prediction |
+| `GET` | `/api/locations/wind` | List of 12 states for wind prediction |
+| `POST` | `/api/predict/solar` | Solar energy prediction |
+| `POST` | `/api/predict/wind` | Wind energy prediction |
+
+### POST `/api/predict/solar` and `/api/predict/wind`
+
+**Request body:**
+```json
+{ "location": "Bavaria (Bayern)", "year": 2024 }
+```
+
+**Response fields:**
+
+| Field | Type | Description |
+|---|---|---|
+| `annual_gwh` | float | Total annual generation in GWh |
+| `monthly_gwh` | float[12] | Monthly breakdown (Jan–Dec) |
+| `capacity_mw` | int | State installed capacity in MW |
+| `peak_month` | string | Month with highest output |
+| `location_desc` | string | Human-readable state description |
+| `chart` | string | Base64-encoded PNG chart (dark theme) |
+| `model` | string | Model identifier string |
+
+**Solar locations (12 states):**
+Bavaria, Baden-Württemberg, Saxony-Anhalt, Brandenburg, Saxony, Rhineland-Palatinate, Hesse, Thuringia, North Rhine-Westphalia, Lower Saxony, Schleswig-Holstein, Hamburg
+
+**Wind locations (12 states):**
+Lower Saxony, Schleswig-Holstein, Brandenburg, Mecklenburg-Vorpommern, Saxony-Anhalt, Hamburg, North Rhine-Westphalia, Thuringia, Hesse, Rhineland-Palatinate, Baden-Württemberg, Bavaria
 
 ---
 
 ## How It Works
 
-1. **User selects** an energy type (solar/wind), a German state, and a year range via the web UI.
-2. **The backend** loads the pre-trained Random Forest model and the real dataset's monthly seasonal profiles.
-3. **Capacity for future years** is extrapolated linearly from known national installed-capacity data.
-4. **State-specific capacity factors** scale the national baseline to regional conditions (e.g. Bavaria has the highest solar CF; Schleswig-Holstein has the highest wind CF).
-5. **Monthly predictions** (MWh) are generated and returned as JSON, then rendered as charts on the results page.
+1. **User selects** an energy type (solar/wind), a German state, and a target year via the web UI.
+2. **Flask receives** the POST request and looks up the state's share of national installed capacity and its location-specific capacity factor.
+3. **National capacity** for the chosen year is either looked up from historical data (2015–2024) or linearly extrapolated for future years.
+4. **Monthly GWh** is computed as:
+   ```
+   GWh = monthly_CF × location_CF × state_capacity_MW × hours_in_month / 1000
+   ```
+   where `monthly_CF` is derived from the real seasonal mean of 10 years of hourly data.
+5. **A chart** is generated (dark-themed bar chart + cumulative line) and returned as a base64 PNG alongside the JSON prediction.
+6. **The frontend** renders the chart and a stats card showing annual total, peak month, and installed capacity — no page reload.
 
 ---
 
 ## Screenshots
 
-<img width="1439" alt="Cover Page" src="https://user-images.githubusercontent.com/74909133/211185833-7900ed1d-5cef-4d75-b128-0e1953ec526d.png">
-<img width="1440" alt="About Section" src="https://user-images.githubusercontent.com/74909133/211185843-3c5464cd-8dbc-4c21-bac7-02035c74433d.png">
-<img width="1440" alt="Solar Predictor" src="https://user-images.githubusercontent.com/74909133/211185851-e1f6a5cb-2258-4bef-ae44-5aa2d266cc92.png">
-<img width="1439" alt="Advantages" src="https://user-images.githubusercontent.com/74909133/211185852-9a6cc865-e25b-4e64-b2fa-603197d3117d.png">
-<img width="1440" alt="Wind Predictor" src="https://user-images.githubusercontent.com/74909133/211185854-f65a083c-1ef2-4a82-b974-cde3e9249800.png">
+### Landing Page
+![Landing Page](website/img/screenshots/home.png)
+
+### Solar Energy Predictor — Input Form
+![Solar Predictor Form](website/img/screenshots/solar_predictor.png)
+
+### Solar Energy Predictor — Prediction Result (Bavaria, 2024 · 20,602 GWh)
+![Solar Prediction Result](website/img/screenshots/solar_result.png)
+
+### Wind Energy Predictor — Input Form
+![Wind Predictor Form](website/img/screenshots/wind_predictor.png)
+
+### Wind Energy Predictor — Prediction Result (Schleswig-Holstein, 2024 · 32,792 GWh)
+![Wind Prediction Result](website/img/screenshots/wind_result.png)
 
 ---
 
@@ -216,4 +326,4 @@ Open your browser at `http://localhost:5000`.
 
 ---
 
-<p align="center">Made with dedication for a sustainable energy future 🌱</p>
+<p align="center">Built for a sustainable energy future</p>
