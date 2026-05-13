@@ -313,14 +313,4 @@ Lower Saxony, Schleswig-Holstein, Brandenburg, Mecklenburg-Vorpommern, Saxony-An
 
 ---
 
-## Team
-
-- Aluru Arunkumar
-- Mehak Aggarwal
-- Sonanshi Goel
-- Shambhavi Rai
-- Princy Singhal
-
----
-
 <p align="center">Built for a sustainable energy future</p>
